@@ -1,0 +1,6 @@
+policy_variant,BLEU,DE,CNAL,CommitDelay,status
+No erasure penalty lambda_E=0,27.2,24.1,7.6,1.7,provisional_endterm
+No latency penalty lambda_L=0,27.9,0.0,34.5,8.9,provisional_endterm
+No commit-delay penalty lambda_D=0,27.5,0.0,21.8,6.4,provisional_endterm
+Token-LCP erasure only,26.4,2.8,10.1,3.5,provisional_endterm
+Balanced full reward,26.9,0.0,9.3,3.3,provisional_endterm

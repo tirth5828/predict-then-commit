@@ -1,0 +1,48 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "predict-then-commit"
+version = "0.1.0"
+description = "Stable prefix commitment for streaming neural machine translation."
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [
+  {name = "Tirth Joshi", email = "tirth5828@gmail.com"}
+]
+keywords = ["streaming machine translation", "NMT", "reinforcement learning", "latency", "flicker", "stability"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Intended Audience :: Science/Research",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence"
+]
+
+dependencies = [
+  "torch>=2.1",
+  "transformers>=4.40",
+  "datasets>=2.18",
+  "sacrebleu>=2.4",
+  "pandas>=2.0",
+  "numpy>=1.24",
+  "matplotlib>=3.7",
+  "tqdm>=4.66",
+  "PyYAML>=6.0",
+  "rich>=13.7"
+]
+
+[project.optional-dependencies]
+comet = ["unbabel-comet>=2.2"]
+dev = ["pytest>=8.0", "ruff>=0.5", "black>=24.0"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.black]
+line-length = 100
+
+[tool.ruff]
+line-length = 100
+src = ["src", "scripts", "tests"]

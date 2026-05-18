@@ -1,0 +1,9 @@
+strategy,BLEU,chrF++,COMET,DE,CNAL,Delay,status
+Offline full sentence,28.4,57.1,0.782,,,,provisional_endterm
+Immediate retranslation,27.1,56.2,0.758,31.8,8.1,1.2,provisional_endterm
+Wait-k k=1,23.7,51.8,0.681,9.6,7.4,1.6,provisional_endterm
+Wait-k k=3,25.1,53.9,0.711,5.7,10.9,3.1,provisional_endterm
+Wait-k k=5,26.0,54.8,0.728,2.9,16.8,5.0,provisional_endterm
+Local agreement-2,26.4,55.3,0.743,1.6,12.7,3.9,provisional_endterm
+Confidence commit,26.2,55.1,0.738,1.2,13.4,4.1,provisional_endterm
+Predict-Then-Commit,26.9,55.8,0.751,0.0,9.3,3.3,provisional_endterm

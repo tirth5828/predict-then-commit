@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+message: "If you use this codebase, please cite it as below."
+title: "Predict-Then-Commit: Stable Prefix Commitment for Streaming Neural Machine Translation"
+authors:
+  - family-names: Joshi
+    given-names: Tirth
+year: 2026
+version: 0.1.0
+license: MIT
