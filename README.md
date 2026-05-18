@@ -7,9 +7,9 @@ Quality–Latency–Stability Optimization under Character-Level Retraction Cons
 
 `Predict-Then-Commit` is an experimental research codebase for **streaming neural machine translation (NMT)** where the system must decide **when to expose translated text to the user**. The core idea is to separate three objects that are usually conflated:
 
-- the model's internal tentative hypothesis, \(h^{(t)}\),
-- the stable committed prefix, \(c^{(t)}\),
-- the exact visible output stream, \(z^{(t)}\).
+- the model's internal tentative hypothesis, $h^{(t)}$,
+- the stable committed prefix, $c^{(t)}$,
+- the exact visible output stream, $z^{(t)}$.
 
 This lets us evaluate not only translation quality and latency, but also **visible text retraction**, the flicker users actually see when streaming subtitles or live translation systems revise previously displayed text.
 
@@ -43,9 +43,9 @@ Do not treat provisional numbers as a substitute for saved experiment logs. Peer
 
 Standard offline NMT receives the full source sentence before generation. Streaming NMT operates under partial context:
 
-\[
+$$
 x_{\leq g_t} = (x_1, \ldots, x_{g_t}), \qquad g_t \leq g_{t+1}.
-\]
+$$
 
 A conventional retranslation system may repeatedly decode from each new source prefix. This often gives high final quality, but the visible text can flicker:
 
@@ -73,78 +73,78 @@ The model is allowed to change its mind internally. The user-visible display sho
 
 Let the source sentence be
 
-\[
+$$
 x = (x_1, x_2, \ldots, x_n), \qquad x_i \in \mathcal{V}_{src}.
-\]
+$$
 
-At streaming step \(t\), the system has read source prefix
+At streaming step $t$, the system has read source prefix
 
-\[
+$$
 x_{\leq g_t} = (x_1, \ldots, x_{g_t}), \qquad 0 \leq g_t \leq n.
-\]
+$$
 
 The read schedule is monotone:
 
-\[
+$$
 g_t \leq g_{t+1}.
-\]
+$$
 
 The reference target sequence is
 
-\[
+$$
 y^\star = (y^\star_1, \ldots, y^\star_m), \qquad y_i^\star \in \mathcal{V}_{tgt}.
-\]
+$$
 
 ### Tentative hypothesis
 
 The translation model produces an internal tentative hypothesis:
 
-\[
+$$
 h^{(t)} = \arg\max_{y \in \mathcal{V}_{tgt}^{\ast}}
 P_\phi\!\left(y \mid x_{\leq g_t}, c^{(t-1)}\right).
-\]
+$$
 
 This sequence is **not required to be monotone**:
 
-\[
+$$
 h^{(t)} \not\preceq h^{(t+1)} \quad \text{in general.}
-\]
+$$
 
 ### Committed prefix
 
 The committed prefix is the stable target sequence exposed by the system:
 
-\[
+$$
 c^{(t)} \in \mathcal{V}_{tgt}^{\ast}.
-\]
+$$
 
 It must satisfy append-only monotonicity:
 
-\[
+$$
 c^{(t-1)} \preceq c^{(t)} \quad \forall t.
-\]
+$$
 
 The policy may append a stable extension:
 
-\[
+$$
 c^{(t)} = c^{(t-1)} \oplus \Delta c^{(t)}.
-\]
+$$
 
 The new committed prefix must be compatible with the current tentative hypothesis:
 
-\[
+$$
 c^{(t-1)} \preceq c^{(t)} \preceq h^{(t)}.
-\]
+$$
 
 ### Visible output stream
 
-Let \(D(\cdot)\) be detokenization from target BPE tokens to surface characters. The visible output stream is
+Let $D(\cdot)$ be detokenization from target BPE tokens to surface characters. The visible output stream is
 
-\[
+$$
 z^{(t)} = D(c^{(t)}).
-\]
+$$
 
-All stability metrics are computed over \(z^{(t)}\), not over hidden decoder states.
+All stability metrics are computed over $z^{(t)}$, not over hidden decoder states.
 
 ---
 
@@ -152,74 +152,74 @@ All stability metrics are computed over \(z^{(t)}\), not over hidden decoder sta
 
 ### Detokenized Erasure
 
-Let \(\mathrm{LCP}(a,b)\) denote the longest common prefix of two character strings. The step-level visible erasure is
+Let $\mathrm{LCP}(a,b)$ denote the longest common prefix of two character strings. The step-level visible erasure is
 
-\[
+$$
 e_t = |z^{(t-1)}| - \left|\mathrm{LCP}\left(z^{(t-1)}, z^{(t)}\right)\right|.
-\]
+$$
 
 Total Detokenized Erasure:
 
-\[
+$$
 E_{DE} = \sum_{t=2}^{T} e_t.
-\]
+$$
 
 Normalized Detokenized Erasure:
 
-\[
+$$
 NDE = \frac{E_{DE}}{\sum_{t=1}^{T}|z^{(t)}| + \epsilon}.
-\]
+$$
 
 ### Character-Normalized Average Lagging
 
-Define token character mass \(\chi(v)\) after stripping tokenizer markers such as `▁`, `Ġ`, and `##`.
+Define token character mass $\chi(v)$ after stripping tokenizer markers such as `▁`, `Ġ`, and `##`.
 
-Source character mass read by time \(t\):
+Source character mass read by time $t$:
 
-\[
+$$
 C_{src}(t)=\sum_{j=1}^{g_t}\chi_{src}(x_j).
-\]
+$$
 
 Visible target character mass:
 
-\[
+$$
 C_{vis}(t)=|z^{(t)}|.
-\]
+$$
 
 Corpus-level source/target character ratio:
 
-\[
+$$
 \gamma = \frac{\mathbb{E}_{(x,y)\sim \mathcal{D}}[|D(y)|]}
 {\mathbb{E}_{(x,y)\sim \mathcal{D}}[|D(x)|]}.
-\]
+$$
 
 Instantaneous lag:
 
-\[
+$$
 L_{CNAL}(t)=\max(0, C_{src}(t)-\gamma C_{vis}(t)).
-\]
+$$
 
 Sentence-level CNAL:
 
-\[
+$$
 CNAL = \frac{1}{T}\sum_{t=1}^{T}L_{CNAL}(t).
-\]
+$$
 
 ### Commit Delay
 
 A zero-erasure system can cheat by waiting forever, so commit delay is measured explicitly.
 
-Let \(r(i)\) be the source read position when committed token \(c_i\) first appears.
+Let $r(i)$ be the source read position when committed token $c_i$ first appears.
 
-\[
+$$
 D_{commit} = \frac{1}{|c^{(T)}|}\sum_{i=1}^{|c^{(T)}|}r(i).
-\]
+$$
 
 Character-weighted delay:
 
-\[
+$$
 D_{char}=\frac{\sum_i \chi(c_i)r(i)}{\sum_i\chi(c_i)}.
-\]
+$$
 
 ---
 
@@ -247,11 +247,11 @@ Append stable prefix -> visible output z(t)
 
 The policy optimizes:
 
-\[
+$$
 R = Q(c^{(T)}, y^\star) - \lambda_E E_{DE} - \lambda_L CNAL - \lambda_D D_{commit}.
-\]
+$$
 
-where \(Q\) is a translation-quality reward derived from BLEU/chrF/COMET-style signals.
+where $Q$ is a translation-quality reward derived from BLEU/chrF/COMET-style signals.
 
 ---
 
@@ -391,7 +391,7 @@ The reference list is passed as `[references]`, not `[[r] for r in references]`.
 |---|---|
 | Offline full sentence | Upper bound with full source context. |
 | Immediate retranslation | Decode from every source prefix and display the full hypothesis. |
-| Wait-k | Fixed lag with \(k \in \{1,3,5,7\}\). |
+| Wait-k | Fixed lag with $k \in \{1,3,5,7\}$. |
 | Local agreement-2 | Commit only after a prefix repeats for two consecutive updates. |
 | Confidence commit | Commit when decoder confidence exceeds a threshold. |
 | Predict-Then-Commit | Learned policy-gradient stable-prefix commitment. |
@@ -421,9 +421,9 @@ Interpretation: Predict-Then-Commit preserves roughly 94.7% of offline BLEU whil
 
 | Policy Variant | BLEU ↑ | DE ↓ | CNAL ↓ | Commit Delay ↓ |
 |---|---:|---:|---:|---:|
-| No erasure penalty, \(\lambda_E=0\) | 27.2 | 24.1 | 7.6 | 1.7 |
-| No latency penalty, \(\lambda_L=0\) | 27.9 | 0.0 | 34.5 | 8.9 |
-| No commit-delay penalty, \(\lambda_D=0\) | 27.5 | 0.0 | 21.8 | 6.4 |
+| No erasure penalty, $\lambda_E=0$ | 27.2 | 24.1 | 7.6 | 1.7 |
+| No latency penalty, $\lambda_L=0$ | 27.9 | 0.0 | 34.5 | 8.9 |
+| No commit-delay penalty, $\lambda_D=0$ | 27.5 | 0.0 | 21.8 | 6.4 |
 | Token-LCP erasure only | 26.4 | 2.8 | 10.1 | 3.5 |
 | Balanced full reward | **26.9** | **0.0** | **9.3** | **3.3** |
 
@@ -463,3 +463,70 @@ The prefix logs contain:
 | `step_erasure` | Character retraction at the step. |
 | `step_cnal` | Character lag at the step. |
 | `action` | READ / COMMIT / FLUSH. |
+
+---
+
+## Repository Layout
+
+```text
+predict-then-commit/
+├── README.md
+├── pyproject.toml
+├── requirements.txt
+├── .gitignore
+├── configs/
+│   ├── smoke.yaml
+│   └── paper.yaml
+├── src/
+│   └── ptc/
+│       ├── __init__.py
+│       ├── config.py
+│       ├── reproducibility.py
+│       ├── data.py
+│       ├── metrics.py
+│       ├── model.py
+│       ├── decoding.py
+│       ├── policies.py
+│       ├── train.py
+│       ├── evaluate.py
+│       ├── plotting.py
+│       └── logging_utils.py
+├── scripts/
+│   ├── train.py
+│   ├── evaluate.py
+│   └── run_smoke.sh
+├── notebooks/
+│   └── Predict_Then_Commit_End_to_End_Experimentation.ipynb
+├── results/
+│   └── provisional/
+│       ├── summary_metrics.csv
+│       └── ablation_reward_components.csv
+├── docs/
+│   ├── report.pdf
+│   ├── report.tex
+│   ├── presentation.pdf
+│   └── AI_USAGE.md
+└── tests/
+    └── test_metrics.py
+```
+
+---
+
+## Citation
+
+If you use this codebase, cite the project as:
+
+```bibtex
+@misc{joshi2026predictcommit,
+  title={Predict-Then-Commit: Stable Prefix Commitment for Streaming Neural Machine Translation},
+  author={Joshi, Tirth},
+  year={2026},
+  note={Research codebase for quality-latency-stability optimization in streaming NMT}
+}
+```
+
+---
+
+## License
+
+MIT License. See `LICENSE`.
