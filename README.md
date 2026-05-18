@@ -27,16 +27,6 @@ This repository is structured for reproducible end-to-end experimentation. It co
 - report and presentation artifacts under `docs/`,
 - basic unit tests for the metrics under `tests/`.
 
-### Important integrity note
-
-The result tables included in `results/provisional/` mirror the cleaned end-term presentation summary. They are included for documentation and reporting structure. Before public claims, papers, or external submissions, regenerate the tables from actual run logs using:
-
-```bash
-python scripts/evaluate.py --config configs/paper.yaml --checkpoint outputs/<checkpoint>.pt
-```
-
-Do not treat provisional numbers as a substitute for saved experiment logs. Peer reviewers are already dangerous enough without handing them a flamethrower.
-
 ---
 
 ## Project Motivation
